@@ -1,10 +1,10 @@
-import math
-
 from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+import numpy as np
 
 @dataclass
 class Config:
@@ -45,7 +45,7 @@ class CausalAttentionLayer(nn.Module):
         v = v.view(batch_size, seq_len, self.n_head, emb_size // self.n_head).transpose(1, 2)
 
         # attention calculation
-        att = (q @ k.transpose(-2, -1) * (1.0 / math.sqrt(k.size(-1))))
+        att = (q @ k.transpose(-2, -1) * (1.0 / np.sqrt(k.size(-1))))
         att = att.masked_fill(self.mask[:, :, :seq_len, :seq_len] == 0, float("-inf"))
         att = F.softmax(att, dim=-1)
         att = self.dropout1(att)
