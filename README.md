@@ -8,7 +8,7 @@ In the Vietnamese language, words can have multiple accents compared to English.
 
 Although limited, there has been studies on this problem in the past, with Transformer. Most notable is [duongntbk's repo](https://github.com/duongntbk/restore_vietnamese_diacritics), which incorporates the BERT architecture (Bidirectional Encoder Representations from Transformers) and see this as a machine translation problem. His method achieved 94.05% accuracy on test datasets. Another research related to this is from [Phuong](https://www.sciencedirect.com/science/article/pii/S0950705121007668), who also used the BERT architecture to generate diacritics from text online with the purpose of detecting hate speech on Vietnamese social media. They achieved around 92% accuracy.
 
-In our project Accentator, we will apply the GPT structure, which is unidirectional and decoder-only, and see if it improves over bidirectional methods.
+In our project Accentator, we will apply a lightweight version of the GPT-2 structure, which is unidirectional and decoder-only, and see if it improves over bidirectional methods.
 
 ## Methodology
 
