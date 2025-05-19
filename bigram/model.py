@@ -15,17 +15,17 @@ class BigramModel(nn.Module):
         self.config = config
         self.word_embeddings = nn.Embedding(config.vocab_size, config.vocab_size)
 
-    def forward(self, x):
-        out = self.word_embeddings(x)
-        return out
-    
-    def generate(self, x, max_length):
-        for _ in range(max_length):
-            logits = self.forward(x)
-            probs = F.softmax(logits[:, -1, :], dim=-1)
-            next_token = torch.multinomial(probs, num_samples=1)
-            x = torch.cat((x, next_token), dim=1)
+        torch.nn.init.normal_(self.word_embeddings.weight, mean=0.0, std=0.02)
 
-            if x.size(1) >= self.config.block_size:
-                break
-        return x
+    def forward(self, x, targets=None):
+        logits = self.word_embeddings(x)
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        return logits, loss
+    
+    def generate(self, x):
+        logits, _ = self.forward(x)
+        logits = logits.argmax(dim=-1)
+        return logits
