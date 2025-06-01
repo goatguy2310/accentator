@@ -13,7 +13,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # configurations
 batch_size = 64
-max_epochs = 50000
+max_epochs = 100000
 start_epoch = 1
 
 eval_interval = 1000
@@ -26,6 +26,7 @@ lr_decay_iters = max_epochs * 0.95
 
 best_test_loss = float("inf")
 always_save_checkpoint = False
+history = {"loss": [], "accuracy": [], "true_accuracy": []}
 
 resume = False
 checkpoint_file = "accentator_checkpoint.pt"
@@ -41,6 +42,15 @@ model_config = model.Config(
     n_embedding=512,
     dropout=0.1,
 )
+
+# for the accentator_small model
+# model_config = model.Config(
+#     block_size=128,
+#     n_head=4,
+#     n_layer=4,
+#     n_embedding=256,
+#     dropout=0.1,
+# )
 
 # load data
 data = dataloader.Dataloader(
@@ -59,7 +69,8 @@ if resume:
     model_config = checkpoint["config"]
     m = model.Accentator(model_config).to(device)
     m.load_state_dict(checkpoint["model"])
-    m.eval()
+
+    history = checkpoint.get("history", history)
 
     start_epoch = checkpoint["epoch"] + 1
     print(f"Resuming training from epoch {start_epoch}")
@@ -145,6 +156,10 @@ for epoch in tqdm(range(start_epoch, max_epochs + 1)):
         print(f"Train loss: {losses['train']:.4f}, accuracy: {accuracies['train']:.4f}, true accuracy: {true_accuracies['train']:.4f}")
         print(f"Test loss: {losses['test']:.4f}, accuracy: {accuracies['test']:.4f}, true accuracy: {true_accuracies['test']:.4f}")
 
+        history["loss"].append(losses['test'].item())
+        history["accuracy"].append(accuracies['test'].item())
+        history["true_accuracy"].append(true_accuracies['test'].item())
+
         if losses['test'] < best_test_loss or always_save_checkpoint:
             best_test_loss = losses['test']
 
@@ -154,6 +169,7 @@ for epoch in tqdm(range(start_epoch, max_epochs + 1)):
                 'config': model_config,
                 'epoch': epoch,
                 'optimizer': optimizer.state_dict(),
+                'history': history,
             }
 
             print(f"Saving model to {checkpoint_path}")
