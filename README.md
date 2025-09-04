@@ -31,3 +31,4 @@ Currently, the hyperparameters are:
 We ran experiments on an NVIDIA A5000 24GB VRAM.
 
 ## Results
+See more explanations and results here: https://docs.google.com/presentation/d/1S9H-FJmKm0u2wHCjLgMIbcm8y_VzR3SdODFEyvns7UA/edit?usp=sharing
